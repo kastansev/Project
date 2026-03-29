@@ -510,62 +510,37 @@ with tab5:
 
     plant_time_df = df[df["plant"] == timeline_plant].copy()
 
-    g1, g2 = st.columns(2)
-    g3, g4 = st.columns(2)
+    # -------------------------------
+    # 1. Ανάλυση ανά Ημέρα
+    # -------------------------------
+    st.markdown("#### Ανάλυση ανά Ημέρα")
 
-    with g1:
-        st.markdown("#### Ανάλυση ανά Ημέρα")
-        daily_df = plant_time_df.rename(columns={
-            "date": "Ημερομηνία",
-            "energy": "Ενέργεια (MWh)"
-        })
+    daily_df = plant_time_df.rename(columns={
+        "date": "Ημερομηνία",
+        "energy": "Ενέργεια (MWh)"
+    })
 
-        fig_daily = px.line(
-            daily_df,
-            x="Ημερομηνία",
-            y="Ενέργεια (MWh)",
-            template="plotly_dark"
-        )
-        fig_daily.update_layout(
-            xaxis_title="Ημερομηνία",
-            yaxis_title="Ενέργεια (MWh)",
-            height=350
-        )
-        st.plotly_chart(fig_daily, use_container_width=True)
+    fig_daily = px.line(
+        daily_df,
+        x="Ημερομηνία",
+        y="Ενέργεια (MWh)",
+        template="plotly_dark"
+    )
+    fig_daily.update_layout(
+        xaxis_title="Ημερομηνία",
+        yaxis_title="Ενέργεια (MWh)",
+        height=420
+    )
+    st.plotly_chart(fig_daily, use_container_width=True)
 
-    with g2:
-        st.markdown("#### Ανάλυση ανά Ημέρα Εβδομάδας")
-        weekday_order = ["Δευτέρα", "Τρίτη", "Τετάρτη", "Πέμπτη", "Παρασκευή", "Σάββατο", "Κυριακή"]
+    # -------------------------------
+    # 2. Ανάλυση ανά Εβδομάδα / Μήνα
+    # -------------------------------
+    c1, c2 = st.columns(2)
 
-        weekday_df = (
-            plant_time_df.groupby("Ημέρα Εβδομάδας", as_index=False)["energy"]
-            .mean()
-            .rename(columns={"energy": "Μέση Ενέργεια (MWh)"})
-        )
-        weekday_df["Ημέρα Εβδομάδας"] = pd.Categorical(
-            weekday_df["Ημέρα Εβδομάδας"],
-            categories=weekday_order,
-            ordered=True
-        )
-        weekday_df = weekday_df.sort_values("Ημέρα Εβδομάδας")
-
-        fig_weekday = px.bar(
-            weekday_df,
-            x="Ημέρα Εβδομάδας",
-            y="Μέση Ενέργεια (MWh)",
-            color="Ημέρα Εβδομάδας",
-            template="plotly_dark"
-        )
-        fig_weekday.update_layout(
-            xaxis_title="Ημέρα Εβδομάδας",
-            yaxis_title="Μέση Ενέργεια (MWh)",
-            showlegend=False,
-            height=350
-        )
-        st.plotly_chart(fig_weekday, use_container_width=True)
-
-    with g3:
+    with c1:
         st.markdown("#### Ανάλυση ανά Εβδομάδα")
+
         week_df = (
             plant_time_df.groupby("Αριθμός Εβδομάδας", as_index=False)["energy"]
             .mean()
@@ -589,8 +564,9 @@ with tab5:
         )
         st.plotly_chart(fig_week, use_container_width=True)
 
-    with g4:
+    with c2:
         st.markdown("#### Ανάλυση ανά Μήνα")
+
         month_order = [
             "Ιανουάριος", "Φεβρουάριος", "Μάρτιος", "Απρίλιος", "Μάιος", "Ιούνιος",
             "Ιούλιος", "Αύγουστος", "Σεπτέμβριος", "Οκτώβριος", "Νοέμβριος", "Δεκέμβριος"
@@ -603,7 +579,11 @@ with tab5:
             .sort_values("Αριθμός Μήνα")
         )
 
-        month_df["Μήνας"] = pd.Categorical(month_df["Μήνας"], categories=month_order, ordered=True)
+        month_df["Μήνας"] = pd.Categorical(
+            month_df["Μήνας"],
+            categories=month_order,
+            ordered=True
+        )
         month_df = month_df.sort_values("Αριθμός Μήνα")
 
         fig_month = px.bar(
